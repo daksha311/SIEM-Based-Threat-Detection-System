@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SIEM Dashboard</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #38bdf8;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+        }
+
+        .high { color: red; }
+        .medium { color: orange; }
+    </style>
+</head>
+<body>
+
+<h1>🚨 SIEM Dashboard</h1>
+
+<h3>Total Logs: <span id="logCount"></span></h3>
+
+<div id="alerts"></div>
+
+<script>
+function loadData() {
+    fetch("/analyze")
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("logCount").innerText = data.total_logs;
+
+        let container = document.getElementById("alerts");
+        container.innerHTML = "";
+
+        if (data.alerts.length === 0) {
+            container.innerHTML = "<p>No threats detected ✅</p>";
+            return;
+        }
+
+        data.alerts.forEach(alert => {
+            let div = document.createElement("div");
+            div.className = "card";
+
+            let severityClass = alert.severity.toLowerCase();
+
+            div.innerHTML = `
+                <h3>${alert.type}</h3>
+                <p><b>IP:</b> ${alert.ip}</p>
+                <p>${alert.message}</p>
+                <p class="${severityClass}"><b>Severity:</b> ${alert.severity}</p>
+            `;
+
+            container.appendChild(div);
+        });
+    });
+}
+
+// refresh every 3 seconds
+setInterval(loadData, 3000);
+
+// initial load
+loadData();
+</script>
+
+</body>
+</html>
