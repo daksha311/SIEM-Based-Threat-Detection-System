@@ -2,6 +2,7 @@ from flask import Flask, jsonify, render_template
 import json
 from detection import detect_bruteforce
 from detection import detect_suspicious_behavior, detect_high_requests
+from detection import build_timeline
 
 app = Flask(__name__)
 
@@ -22,9 +23,12 @@ def analyze_logs():
     alerts += detect_suspicious_behavior(logs)
     alerts += detect_high_requests(logs)
 
+    timeline = build_timeline(logs)
+
     return jsonify({
         "total_logs": len(logs),
-        "alerts": alerts
+        "alerts": alerts,
+        "timeline": timeline
     })
 
 if __name__ == "__main__":

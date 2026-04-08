@@ -54,3 +54,22 @@ def detect_high_requests(logs):
             })
 
     return alerts
+#timeline 
+def build_timeline(logs):
+    sorted_logs = sorted(logs, key=lambda x: x["time"])
+
+    timeline = []
+    for log in sorted_logs:
+        entry = f"[{log['time']}] {log['ip']} → {log['action']}"
+
+        # Highlight suspicious events
+        if log["action"] == "login_failed":
+            entry += " ⚠️"
+        elif log["action"] == "multiple_tabs":
+            entry += " ⚠️"
+        elif log["action"] == "request":
+            entry += ""
+
+        timeline.append(entry)
+
+    return timeline
