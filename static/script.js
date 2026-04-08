@@ -1,3 +1,4 @@
+let chart;
 function loadData() {
     fetch("/analyze")
     .then(res => res.json())
@@ -40,6 +41,50 @@ function loadData() {
             div.innerText = event;
             timelineDiv.appendChild(div);
         });
+        // Count events by type
+let eventCounts = {};
+
+data.timeline.forEach(event => {
+    if (event.includes("login_failed")) {
+        eventCounts["login_failed"] = (eventCounts["login_failed"] || 0) + 1;
+    } else if (event.includes("login_success")) {
+        eventCounts["login_success"] = (eventCounts["login_success"] || 0) + 1;
+    } else if (event.includes("multiple_tabs")) {
+        eventCounts["multiple_tabs"] = (eventCounts["multiple_tabs"] || 0) + 1;
+    } else if (event.includes("request")) {
+        eventCounts["request"] = (eventCounts["request"] || 0) + 1;
+    }
+});
+
+let labels = Object.keys(eventCounts);
+let values = Object.values(eventCounts);
+
+// Destroy old chart
+if (chart) {
+    chart.destroy();
+}
+
+// Create new chart
+let ctx = document.getElementById("trafficChart").getContext("2d");
+
+chart = new Chart(ctx, {
+    type: "pie",   // 🔥 pie chart is best here
+    data: {
+        labels: labels,
+        datasets: [{
+            data: values
+        }]
+    },
+    options: {
+        plugins: {
+            legend: {
+                labels: {
+                    color: "white"
+                }
+            }
+        }
+    }
+});
 
     });
 }
